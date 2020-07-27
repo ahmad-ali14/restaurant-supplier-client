@@ -19,10 +19,11 @@ function App() {
   const [password, setPassword] = useState(null)
   const [loggedin, setLoggedin] = useState(false)
   const [store, setStore] = useState(null)
-  const [role, setRole] = useState("supplier")
+  const [role, setRole] = useState(null)
   const [allRstaurants, setAllRestaurants] = useState([])
   const [allSuppliers, setAllSuppliers] = useState([])
   const [appErr, setAppErr] = useState("")
+  const [myId, setMyId] = useState(null)
 
 
   const getAllRestaurants = () => {
@@ -33,16 +34,40 @@ function App() {
       method: "GET",
       headers: { Token: JSON.parse(localStorage.getItem("login")).token },
     })
-      .then((res) => { return res.json(); })
+      .then((res) => {
+        return res.json();
+      })
       .then(result => {
         setAllRestaurants(result);
         console.log('allRestaurants', allRstaurants)
       }).catch((err) => console.log(err))
   }
 
+  const getAllSuppliers = () => {
+    if (!loggedin) {
+      return
+    }
+    fetch(`${domain}/suppliers/all`, {
+      method: "GET",
+      headers: { Token: JSON.parse(localStorage.getItem("login")).token },
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then(result => {
+        setAllSuppliers(result);
+      }).catch((err) => console.log(err))
+  }
+
+  const getRestaurantsOrSuppliers = () => {
+    if (role === "restaurant") { getAllSuppliers() }
+    if (role === "supplier") { getAllRestaurants() }
+
+  }
   useEffect(() => {
     checkAuth()
     getAllRestaurants()
+    getAllSuppliers()
   }, [])
 
   const checkAuth = () => {
@@ -51,10 +76,18 @@ function App() {
     if (storee && storee.loggedin) {
       setStore(storee)
       setLoggedin(true)
+      setRole(storee.role)
+      setMyId(storee.myId)
     }
   }
 
+  const sleep = (ms) => {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
   const Login = (e) => {
+
+    e.preventDefault()
     if (email == null || email == "" || password == null || password == "") {
       e.preventDefault();
       setAppErr("enter email and password")
@@ -67,36 +100,29 @@ function App() {
       method: "POST",
       body: JSON.stringify({ email, password })
     })
-      .then((res) => {
+      .then(async (res) => {
+
+        await sleep(3000)
+        console.log("after 3s")
         console.log("res", res);
         return res.json()
       })
+      .then((result) => {
+        console.log("after 3s")
 
-    // return console.log('loginResult', loginResult);
+        console.log(result);
 
-    // .then(result => 
-
-    //   return result ;
-
-    //   {
-
-    //   console.log("before 3s")
-
-    //   setTimeout(() => {
-    //     console.log("after 3s")
-
-    //     console.log(result);
-
-    //     localStorage.setItem('login', JSON.stringify({
-    //       loggedin: true,
-    //       token: result.token
-    //     }))
+        localStorage.setItem('login', JSON.stringify({
+          loggedin: true,
+          token: result.token,
+          role: result.role,
+          myId: result.userAccount.find(e => e.Key === "_id").Value
+        }))
 
 
-    //     checkAuth()
-    //   })
+        checkAuth()
+      })
 
-    // }, 3000);
 
   }
 
@@ -150,7 +176,9 @@ function App() {
 
             {!loggedin ? Home : (
               <>
-                {role === "restaurant" && <RestaurantUi />}
+                {role === "restaurant" && <RestaurantUi
+
+                />}
                 {role === "supplier" && <SupplierUi
                   allRestaurants={allRstaurants}
                   getAllRestaurants={getAllRestaurants}
