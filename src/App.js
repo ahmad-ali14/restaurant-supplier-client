@@ -24,6 +24,7 @@ function App() {
   const [allSuppliers, setAllSuppliers] = useState([])
   const [appErr, setAppErr] = useState("")
   const [myId, setMyId] = useState(null)
+  const [myOrders, setMyOrders] = useState([])
 
 
   const getAllRestaurants = () => {
@@ -64,11 +65,26 @@ function App() {
     if (role === "supplier") { getAllRestaurants() }
 
   }
-  useEffect(() => {
-    checkAuth()
-    getAllRestaurants()
-    getAllSuppliers()
-  }, [])
+
+  const getMyOrders = () => {
+    if (!loggedin || !myId) {
+      return
+    }
+    fetch(`${domain}/order/my-orders/${myId}`, {
+      method: "GET",
+      headers: { Token: JSON.parse(localStorage.getItem("login")).token },
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .then(result => {
+        setMyOrders(result);
+      }).catch((err) => console.log(err))
+
+  }
+
+
+
 
   const checkAuth = () => {
     let storee = JSON.parse(localStorage.getItem("login"))
@@ -122,9 +138,13 @@ function App() {
 
         checkAuth()
       })
-
-
   }
+
+  useEffect(() => {
+    checkAuth()
+    getRestaurantsOrSuppliers()
+    getMyOrders()
+  }, [])
 
 
   const Home = <div className="row text-center">
