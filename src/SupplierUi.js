@@ -1,11 +1,18 @@
 import React from 'react';
 
-const SupplierUi = ({ allRestaurants, getAllRestaurants }) => {
+const SupplierUi = ({ allRestaurants, getAllRestaurants, myOrders, getMyOrders }) => {
 
     console.log("allrestaurants", allRestaurants)
 
     if (allRestaurants.length === 0) {
         getAllRestaurants()
+    }
+
+    console.log("my oreders inside ", myOrders)
+
+
+    if (myOrders.length === 0) {
+        getMyOrders()
     }
 
     return (
@@ -19,7 +26,7 @@ const SupplierUi = ({ allRestaurants, getAllRestaurants }) => {
                         <tr>
                             <th scope="col" width="7%">#</th>
                             <th scope="col">Order Id</th>
-                            <th scope="col">Supplier</th>
+                            <th scope="col">To Restaurant</th>
                             <th scope="col">Value(£)</th>
                             <th scope="col">Status</th>
                             <th scope="col">Actions</th>
@@ -30,21 +37,45 @@ const SupplierUi = ({ allRestaurants, getAllRestaurants }) => {
                     </thead>
                     <tbody>
 
-                        <tr>
-                            <th scope="row" >1</th>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>2</td>
-                            <td>3</td>
-                        </tr>
+                        {myOrders && myOrders.map((r, i) => {
+
+                            return (
+                                < tr >
+                                    <th scope="row" >{i + 1}</th>
+                                    <td>{r._id}</td>
+                                    <td>{r.restaurantId}</td>
+                                    <td>{r.value}</td>
+                                    <td>{r.status}</td>
+                                    <td>
+                                        <button className="btn btn-warning mr-1">Action1</button>
+                                        <button className="btn btn-warning ml-1">Action2</button>
+                                    </td>
+
+                                    <td>
+                                        {r.comments.map((d, i) => {
+                                            return (
+
+                                                <p>
+                                                    <span className="text-danger">from: {d.from} </span>
+                                                    <span className="text-info"> :: </span>
+                                                    <span className="text-black"> {d.message} </span>
+                                                </p>
+                                            )
+                                        })}
+                                    </td>
+
+                                </tr>
+                            )
+
+                        })
+
+                        }
 
 
-
+                        {/* 
                         <tr>
                             <td colSpan="7"><button className="btn btn-info text-white mt-2 mb-2" >Add New Order</button></td>
-                        </tr>
+                        </tr> */}
                     </tbody>
 
 
@@ -77,8 +108,8 @@ const SupplierUi = ({ allRestaurants, getAllRestaurants }) => {
                                     <td>{r.phone}</td>
                                     <td>{r.email}</td>
                                     <td>
-                                        <button className="btn btn-warning">Action1</button>
-                                        <button className="btn btn-warning">Action2</button>
+                                        <button className="btn btn-warning mr-1">Action1</button>
+                                        <button className="btn btn-warning ml-1">Action2</button>
                                     </td>
 
                                 </tr>
@@ -89,10 +120,10 @@ const SupplierUi = ({ allRestaurants, getAllRestaurants }) => {
                         }
 
 
-
+                        {/* 
                         <tr>
                             <td colSpan="6"><button className="btn btn-info text-white mt-2 mb-2" >Add New Row</button></td>
-                        </tr>
+                        </tr> */}
                     </tbody>
 
 

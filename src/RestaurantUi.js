@@ -1,6 +1,19 @@
 import React from 'react';
 
-const RestaurantUi = () => {
+const RestaurantUi = ({ allSuppliers, getAllSuppliers, myOrders, getMyOrders }) => {
+
+    console.log("allSuppliers", allSuppliers)
+
+    if (allSuppliers.length === 0) {
+        getAllSuppliers()
+    }
+
+    console.log("my oreders inside ", myOrders)
+
+
+    if (myOrders.length === 0) {
+        getMyOrders()
+    }
 
     return (
         <div className="row text-center p-5">
@@ -24,16 +37,38 @@ const RestaurantUi = () => {
                     </thead>
                     <tbody>
 
-                        <tr>
-                            <th scope="row" >1</th>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>2</td>
-                            <td>3</td>
-                        </tr>
+                        {myOrders && myOrders.map((r, i) => {
 
+                            return (
+                                < tr >
+                                    <th scope="row" >{i + 1}</th>
+                                    <td>{r._id}</td>
+                                    <td>{r.restaurantId}</td>
+                                    <td>{r.value}</td>
+                                    <td>{r.status}</td>
+                                    <td>
+                                        <button className="btn btn-warning mr-1">Action1</button>
+                                        <button className="btn btn-warning ml-1">Action2</button>
+                                    </td>
+
+                                    <td>
+                                        {r.comments.map((d, i) => {
+                                            return (
+                                                < p >
+                                                    <span className="text-danger">from: {d.from} </span>
+                                                    <span className="text-info"> :: </span>
+                                                    <span className="text-black"> {d.message} </span>
+                                                </p>
+                                            );
+                                        })}
+                                    </td>
+
+                                </tr>
+                            )
+
+                        })
+
+                        }
 
 
                         <tr>
@@ -63,21 +98,45 @@ const RestaurantUi = () => {
                     </thead>
                     <tbody>
 
-                        <tr>
-                            <th scope="row" >1</th>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>2</td>
-                            <td>3</td>
-                            <td>2</td>
-                            <td>3</td>
-                        </tr>
+                        {allSuppliers && allSuppliers.map((r, i) => {
+
+                            return (
+                                < tr >
+                                    <th scope="row" >{i + 1}</th>
+                                    <td>{r.name}</td>
+                                    <td>{r.address}</td>
+                                    <td>{r.phone}</td>
+                                    <td>{r.email}</td>
+                                    <td>
+                                        <button className="btn btn-warning mr-1">Action1</button>
+                                        <button className="btn btn-warning ml-1">Action2</button>
+                                    </td>
+
+                                    <td>
+                                        {r.products.map((d, i) => {
+                                            return (
+
+                                                <p>
+                                                    <span className="text-danger">{d.productName} </span>
+                                                    <span className="text-info"> :: </span>
+                                                    <span className="text-black"> {d.productPrice} £ </span>
+                                                </p>
+                                            )
+                                        })}
+                                    </td>
+
+                                </tr>
+                            )
+
+                        })
+
+                        }
 
 
 
-                        <tr>
+                        {/* <tr>
                             <td colspan="7"><button className="btn btn-info text-white mt-2 mb-2" >Add New Row</button></td>
-                        </tr>
+                        </tr> */}
                     </tbody>
 
 
@@ -85,7 +144,7 @@ const RestaurantUi = () => {
             </div>
 
 
-        </div>
+        </div >
     )
 }
 
