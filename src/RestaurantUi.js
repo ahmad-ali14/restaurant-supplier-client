@@ -17,8 +17,8 @@ const RestaurantUi = ({ allSuppliers, getAllSuppliers, myOrders, getMyOrders }) 
 
     return (
         <div className="row text-center p-5">
-            <h1 className="col-12 mb-5 mt-5">Restaurant UI</h1>
-            <hr />
+            {/* <h1 className="col-12 mb-5 mt-5">Restaurant UI</h1>
+            <hr /> */}
             <h1 className="col-12 mb-1 mt-5"> Your Orders</h1>
             <div className="col-12 table-responsive">
                 <table className="table table-bordered table-sm table-striped m-10px" >
