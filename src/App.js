@@ -12,6 +12,7 @@ import SupplierUi from './SupplierUi'
 import SupplierForm from './SupplierForm'
 import RestaurantForm from './RestaurantForm'
 import { domain } from './config'
+import Nav from './Nav'
 
 function App() {
 
@@ -62,6 +63,7 @@ function App() {
   }
 
   const getRestaurantsOrSuppliers = () => {
+    if (!loggedin) { return }
     if (role === "restaurant") { getAllSuppliers() }
     if (role === "supplier") { getAllRestaurants() }
 
@@ -164,6 +166,9 @@ function App() {
   const logout = () => {
     localStorage.removeItem("login")
     setLoggedin(false)
+    setMyId(null)
+    setStore(null)
+    setRole(null)
   }
 
   useEffect(() => {
@@ -175,13 +180,18 @@ function App() {
 
   const Home = <div className="row text-center">
     <div className="col-12 mt-3 mb-3 mb-2 mt-2 text-center">
-      <button className="col-12 col-md-5 mb-1 mt-1 btn btn-info text-white" >
-        <Link className="text-white" to="/register-supplier"> Register as Supplier</Link>
+      <Link className="text-white" to="/register-supplier">
+        <button className="col-12 col-md-5 mb-1 mt-1 btn btn-info text-white" >
+          Register as Supplier
       </button>
+      </Link>
       <div className="col-12 col-md-2" ></div>
-      <button className="col-12 col-md-5 mb-1 mt-1 btn btn-info text-white" >
-        <Link className="text-white" to="/register-restaurant"> Register as Restaurant</Link>
+
+      <Link className="text-white" to="/register-restaurant">
+        <button className="col-12 col-md-5 mb-1 mt-1 btn btn-info text-white" >
+          Register as Restaurant
       </button>
+      </Link>
     </div>
     <div className="col-12 text-center mt-2 mb-2"><h4> OR </h4></div>
 
@@ -199,10 +209,16 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
+      {/* <header className="App-header">
         <h1>You're Welcome, Supplier Or Restaurant</h1>
         <h1 className="mt-5"><p style={{ fontSize: "8rem" }}>&#x290B; &#x290B; &#x290B; </p></h1>
-      </header>
+      </header> */}
+      <Nav
+        logout={logout}
+        loggedin={loggedin}
+        role={role}
+        myId={myId}
+      />
 
       {/* {appErr !== "" ? loading ? (
         <div className="text-white bg-warning font-weight-bolder font-larger" >
@@ -262,12 +278,8 @@ function App() {
           </Route>
         </Switch>
       </Router>
-      {
-        loggedin && <div>
-          <button className="btn btn-danger" onClick={logout}>Logout</button>
-        </div>
-      }
-    </div >
+
+    </div>
 
   );
 }
