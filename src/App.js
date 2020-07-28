@@ -20,11 +20,12 @@ function App() {
   const [loggedin, setLoggedin] = useState(false)
   const [store, setStore] = useState(null)
   const [role, setRole] = useState(null)
-  const [allRstaurants, setAllRestaurants] = useState([])
+  const [allRestaurants, setAllRestaurants] = useState([])
   const [allSuppliers, setAllSuppliers] = useState([])
   const [appErr, setAppErr] = useState("")
   const [myId, setMyId] = useState(null)
   const [myOrders, setMyOrders] = useState([])
+  const [loading, setLoading] = useState(false)
 
 
   const getAllRestaurants = () => {
@@ -40,7 +41,7 @@ function App() {
       })
       .then(result => {
         setAllRestaurants(result);
-        console.log('allRestaurants', allRstaurants)
+        console.log('allRestaurants', allRestaurants)
       }).catch((err) => console.log(err))
   }
 
@@ -48,7 +49,7 @@ function App() {
     if (!loggedin) {
       return
     }
-    fetch(`${domain}/suppliers/all`, {
+    fetch(`${domain}/supplier/all`, {
       method: "GET",
       headers: { Token: JSON.parse(localStorage.getItem("login")).token },
     })
@@ -67,17 +68,26 @@ function App() {
   }
 
   const getMyOrders = () => {
-    if (!loggedin || !myId) {
+    console.log('getting orders ...');
+
+    if (!loggedin || myId === null) {
       return
     }
+
+    console.log('getting orders with id ...');
+
     fetch(`${domain}/order/my-orders/${myId}`, {
       method: "GET",
       headers: { Token: JSON.parse(localStorage.getItem("login")).token },
     })
       .then((res) => {
+        console.log('ordes', res)
         return res.json();
       })
       .then(result => {
+        if (result === null) {
+          return
+        }
         setMyOrders(result);
       }).catch((err) => console.log(err))
 
@@ -95,6 +105,7 @@ function App() {
       setRole(storee.role)
       setMyId(storee.myId)
     }
+
   }
 
   const sleep = (ms) => {
@@ -102,12 +113,13 @@ function App() {
   }
 
   const Login = (e) => {
-
+    setLoading(true)
     e.preventDefault()
     if (email == null || email == "" || password == null || password == "") {
       e.preventDefault();
       setAppErr("enter email and password")
-      return
+      return setLoading(false)
+
     }
     console.log('logging in .....')
 
@@ -128,16 +140,30 @@ function App() {
 
         console.log(result);
 
+        if (!result.userAccount) {
+          setAppErr("wrong password or email")
+          return setLoading(false)
+
+        }
+
         localStorage.setItem('login', JSON.stringify({
           loggedin: true,
           token: result.token,
           role: result.role,
           myId: result.userAccount.find(e => e.Key === "_id").Value
         }))
+        setLoading(false)
+        setAppErr("")
 
 
         checkAuth()
+
       })
+  }
+
+  const logout = () => {
+    localStorage.removeItem("login")
+    setLoggedin(false)
   }
 
   useEffect(() => {
@@ -178,9 +204,29 @@ function App() {
         <h1 className="mt-5"><p style={{ fontSize: "8rem" }}>&#x290B; &#x290B; &#x290B; </p></h1>
       </header>
 
-      {appErr !== "" && <div className="text-white bg-danger font-weight-bolder font-larger">
-        {appErr}
-      </div>}
+      {/* {appErr !== "" ? loading ? (
+        <div className="text-white bg-warning font-weight-bolder font-larger" >
+          <h3 className="p-3">Wait ...</h3>
+        </div>
+      ) : (
+          <div className="text-white bg-danger font-weight-bolder font-larger" >
+            <h3 className="p-3">{appErr}</h3>
+          </div>
+        ) : ""
+      } */}
+
+      {loading &&
+        <div className="text-white bg-warning font-weight-bolder font-larger" >
+          <h3 className="p-3">Wait ...</h3>
+        </div>
+      }
+
+
+      {appErr !== "" &&
+        <div className="text-white bg-danger font-weight-bolder font-larger" >
+          <h3 className="p-3">{appErr}</h3>
+        </div>
+      }
 
       <Router>
         <Switch>
@@ -198,10 +244,17 @@ function App() {
               <>
                 {role === "restaurant" && <RestaurantUi
 
+                  allSuppliers={allSuppliers}
+                  getAllSuppliers={getAllSuppliers}
+                  myOrders={myOrders}
+                  getMyOrders={getMyOrders}
+
                 />}
                 {role === "supplier" && <SupplierUi
-                  allRestaurants={allRstaurants}
+                  allRestaurants={allRestaurants}
                   getAllRestaurants={getAllRestaurants}
+                  myOrders={myOrders}
+                  getMyOrders={getMyOrders}
                 />}
                 {role === null && <h1>Authorizeed but not assigned to a Role</h1>}
               </>
@@ -209,7 +262,12 @@ function App() {
           </Route>
         </Switch>
       </Router>
-    </div>
+      {
+        loggedin && <div>
+          <button className="btn btn-danger" onClick={logout}>Logout</button>
+        </div>
+      }
+    </div >
 
   );
 }
