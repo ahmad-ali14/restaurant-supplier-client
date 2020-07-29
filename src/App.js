@@ -76,14 +76,11 @@ function App() {
       return
     }
 
-    console.log('getting orders with id ...');
-
     fetch(`${domain}/order/my-orders/${myId}`, {
       method: "GET",
       headers: { Token: JSON.parse(localStorage.getItem("login")).token },
     })
       .then((res) => {
-        console.log('ordes', res)
         return res.json();
       })
       .then(result => {
@@ -97,7 +94,7 @@ function App() {
 
 
 
-
+// check if there are actually data in the localStorage when the app is mountde.
   const checkAuth = () => {
     let storee = JSON.parse(localStorage.getItem("login"))
 
@@ -110,10 +107,12 @@ function App() {
 
   }
 
+  // wait some time.
   const sleep = (ms) => {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
+  
   const Login = (e) => {
     setLoading(true)
     e.preventDefault()
@@ -132,15 +131,13 @@ function App() {
     })
       .then(async (res) => {
 
+      
+      // waiting the response, wich is taking too loong, so I need to make sure te function is not returning before the response came.
         await sleep(3000)
-        console.log("after 3s")
-        console.log("res", res);
+       
         return res.json()
       })
       .then((result) => {
-        console.log("after 3s")
-
-        console.log(result);
 
         if (!result.userAccount) {
           setAppErr("wrong password or email")
@@ -209,27 +206,13 @@ function App() {
 
   return (
     <div className="App">
-      {/* <header className="App-header">
-        <h1>You're Welcome, Supplier Or Restaurant</h1>
-        <h1 className="mt-5"><p style={{ fontSize: "8rem" }}>&#x290B; &#x290B; &#x290B; </p></h1>
-      </header> */}
+ 
       <Nav
         logout={logout}
         loggedin={loggedin}
         role={role}
         myId={myId}
       />
-
-      {/* {appErr !== "" ? loading ? (
-        <div className="text-white bg-warning font-weight-bolder font-larger" >
-          <h3 className="p-3">Wait ...</h3>
-        </div>
-      ) : (
-          <div className="text-white bg-danger font-weight-bolder font-larger" >
-            <h3 className="p-3">{appErr}</h3>
-          </div>
-        ) : ""
-      } */}
 
       {loading &&
         <div className="text-white bg-warning font-weight-bolder font-larger" >
